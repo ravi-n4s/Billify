@@ -1,7 +1,13 @@
 import React from "react";
 
 const Modal = (props) => {
-  const { handleCloseDialog, handleConfirm, enableConfirm } = props;
+  const {
+    handleCloseDialog,
+    handleConfirm,
+    disableConfirmBtn,
+    handleAddExpenseChange,
+    newExpense,
+  } = props;
 
   return (
     <div
@@ -17,40 +23,56 @@ const Modal = (props) => {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Add new expense</h5>
-            <button
-              className="close"
-              onClick={handleCloseDialog}
-              disabled={enableConfirm}
-            >
+            <button className="close" onClick={handleCloseDialog}>
               <span>&times;</span>
             </button>
           </div>
           <div className="modal-body d-flex flex-column">
             <table>
-              <tr>
-                <td>
-                  <label htmlFor="item">Item: </label>
-                </td>
-                <td>
-                  <input type="text" id="item" />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label htmlFor="qty">Qty: </label>
-                </td>
-                <td>
-                  <input type="text" id="qty" />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label htmlFor="amount">Amount: </label>
-                </td>
-                <td>
-                  <input type="text" id="amount" />
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td>
+                    <label htmlFor="item">Item: </label>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      id="item"
+                      name="item"
+                      value={newExpense.item}
+                      onChange={handleAddExpenseChange}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label htmlFor="qty">Qty: </label>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      id="qty"
+                      name="quantity"
+                      value={newExpense.quantity}
+                      onChange={handleAddExpenseChange}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label htmlFor="amount">Amount: </label>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      id="amount"
+                      name="cost"
+                      value={newExpense.cost}
+                      onChange={handleAddExpenseChange}
+                    />
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div className="modal-footer">
@@ -60,7 +82,11 @@ const Modal = (props) => {
             >
               Cancel
             </button>
-            <button className="btn btn-primary" onClick={handleConfirm}>
+            <button
+              className="btn btn-primary"
+              onClick={handleConfirm}
+              disabled={disableConfirmBtn}
+            >
               Confirm
             </button>
           </div>
