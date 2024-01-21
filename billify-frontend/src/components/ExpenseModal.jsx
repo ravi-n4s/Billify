@@ -1,12 +1,16 @@
 import React from "react";
 
-const Modal = (props) => {
+const ExpenseModal = (props) => {
   const {
     handleCloseDialog,
     handleConfirm,
     disableConfirmBtn,
-    handleAddExpenseChange,
+    handleModalOnChange,
     newExpense,
+    confirmBtnText,
+    header,
+    cancelBtnText,
+    removeExpense,
   } = props;
 
   return (
@@ -22,7 +26,7 @@ const Modal = (props) => {
       >
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Add new expense</h5>
+            <h5 className="modal-title">{header}</h5>
             <button className="close" onClick={handleCloseDialog}>
               <span>&times;</span>
             </button>
@@ -39,8 +43,9 @@ const Modal = (props) => {
                       type="text"
                       id="item"
                       name="item"
-                      value={newExpense.item}
-                      onChange={handleAddExpenseChange}
+                      value={newExpense?.item ?? ""}
+                      onChange={handleModalOnChange}
+                      autoFocus
                     />
                   </td>
                 </tr>
@@ -53,8 +58,8 @@ const Modal = (props) => {
                       type="text"
                       id="qty"
                       name="quantity"
-                      value={newExpense.quantity}
-                      onChange={handleAddExpenseChange}
+                      value={newExpense?.quantity ?? ""}
+                      onChange={handleModalOnChange}
                     />
                   </td>
                 </tr>
@@ -67,8 +72,8 @@ const Modal = (props) => {
                       type="text"
                       id="amount"
                       name="cost"
-                      value={newExpense.cost}
-                      onChange={handleAddExpenseChange}
+                      value={newExpense?.cost ?? ""}
+                      onChange={handleModalOnChange}
                     />
                   </td>
                 </tr>
@@ -78,16 +83,20 @@ const Modal = (props) => {
           <div className="modal-footer">
             <button
               className="btn btn-outline-danger"
-              onClick={handleCloseDialog}
+              onClick={() => {
+                cancelBtnText === "Remove"
+                  ? removeExpense()
+                  : handleCloseDialog();
+              }}
             >
-              Cancel
+              {cancelBtnText}
             </button>
             <button
               className="btn btn-primary"
               onClick={handleConfirm}
               disabled={disableConfirmBtn}
             >
-              Confirm
+              {confirmBtnText}
             </button>
           </div>
         </div>
@@ -96,4 +105,4 @@ const Modal = (props) => {
   );
 };
 
-export default Modal;
+export default ExpenseModal;

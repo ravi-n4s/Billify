@@ -12,15 +12,10 @@ import { db } from "../firebase";
 const collectionName = "events";
 
 // Function to update a document by ID
-export const updateDocumentById = async (documentId, updatedExpenses) => {
-  try {
-    const docRef = doc(db, collectionName, documentId);
+export const updateDocumentById = async (documentId, updatedEvent) => {
+  const docRef = doc(db, collectionName, documentId);
 
-    await updateDoc(docRef, { expenses: updatedExpenses });
-    console.log("Document updated successfully!");
-  } catch (error) {
-    console.error("Error updating document:", error);
-  }
+  return await updateDoc(docRef, updatedEvent);
 };
 
 export const readAllEvents = async () => {
@@ -32,6 +27,8 @@ export const readAllEvents = async () => {
       const eventData = {
         id: doc.id,
         name: doc.data().name,
+        expenses: doc.data().expenses,
+        paymentStatus: doc.data().paymentStatus,
       };
       events.push(eventData);
     });
