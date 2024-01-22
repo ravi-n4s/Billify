@@ -9,6 +9,10 @@ import Menu from "../components/Menu";
 import { calculateTotal, formatPriceWithCurrencyAndCommas } from "../util";
 import EventModal from "../components/EventModal";
 import { event as eventObj, expense } from "../model/event";
+import { config } from "../config";
+import { payment } from "../model/payment";
+import { readAllPayments } from "../services/paymentDetailService";
+// import Toast from "../components/Toast";
 
 const EventExpenses = () => {
   const { eventId } = useParams();
@@ -19,14 +23,51 @@ const EventExpenses = () => {
   const [event, setEvent] = useState(eventObj);
   const [editedEvent, setEditedEvent] = useState(eventObj);
   const [newExpense, setNewExpense] = useState(expense);
+  const [paymentDetailList, setPaymentDetailList] = useState([payment]);
+
   const currentIndex = useRef(-1);
+  // const selectedPaymentDetails = useRef("");
+  const [selectedPaymentDetails, setSelectedPaymentDetails] = useState("");
 
   useEffect(() => {
-    readEventById(eventId).then((data) => {
-      setEvent(data);
-      setEditedEvent(data);
-    });
-  }, []);
+    const fetchData = async () => {
+      try {
+        const eventData = await readEventById(eventId);
+        setEvent(eventData);
+        setEditedEvent(eventData);
+
+        const paymentData = await readAllPayments();
+        setPaymentDetailList(paymentData);
+
+        const selectedPayment = paymentData.find(
+          (obj) => obj.id === eventData.paymentId
+        );
+        setSelectedPaymentDetails(selectedPayment?.details);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [eventId]);
+
+  useEffect(() => {
+    const fetchPaymentDetails = async () => {
+      try {
+        const paymentData = await readAllPayments();
+        setPaymentDetailList(paymentData);
+
+        const selectedPayment = paymentData.find(
+          (obj) => obj.id === editedEvent.paymentId
+        );
+        setSelectedPaymentDetails(selectedPayment?.details);
+      } catch (error) {
+        console.error("Error fetching payment details:", error);
+      }
+    };
+
+    fetchPaymentDetails();
+  }, [editedEvent.paymentId]);
 
   const handleSaveToDB = () => {
     toast.promise(updateDocumentById(eventId, editedEvent), {
@@ -112,6 +153,7 @@ const EventExpenses = () => {
 
   const handleChangeEditEvent = (e, nestedProperty) => {
     const { name, value } = e.target;
+    console.log(name, value);
 
     setEditedEvent((prevEvent) => {
       // Split the nested property string into an array
@@ -137,6 +179,14 @@ const EventExpenses = () => {
       // If it's not a nested property, update directly
       if (!nestedProperty) {
         updatedEvent[name] = value;
+        console.log("paymentId", value);
+        if (name === "paymentId") {
+          setPaymentDetailList(paymentDetailList);
+          // setEditedEvent({
+          //   ...editedEvent,
+          //   paymentId: value,
+          // });
+        }
       }
 
       return updatedEvent;
@@ -144,6 +194,9 @@ const EventExpenses = () => {
   };
 
   const handleEditEvent = () => {
+    readAllPayments().then((data) => {
+      setPaymentDetailList(data);
+    });
     setShowEventModal(true);
   };
 
@@ -172,7 +225,7 @@ const EventExpenses = () => {
       <div className="text-center mt-5">
         <br />
         <div className=" d-flex justify-content-center">
-          <h4 className="">{event?.name + " "}</h4>
+          <h4 className="">{editedEvent?.name + " "}</h4>
           <i
             className="bi bi-pencil bi-sm text-warning ms-1 ms-sm-2 d-flex align-items-center"
             style={{ cursor: "pointer" }}
@@ -197,7 +250,15 @@ const EventExpenses = () => {
           >
             Save
           </button>
-          <BlobProvider document={<Bill event={event} />}>
+          <BlobProvider
+            document={
+              <Bill
+                event={editedEvent}
+                config={config}
+                paymentDetails={selectedPaymentDetails}
+              />
+            }
+          >
             {({ blob, url, loading, error }) => {
               return <DownloadButton pdf={blob} />;
             }}
@@ -212,7 +273,6 @@ const EventExpenses = () => {
                 <table className="table table-bordered table-striped table-hover">
                   <thead className="thead-dark">
                     <tr>
-                      {/* <th></th> */}
                       <th></th>
                       <th>Item</th>
                       <th>Qty</th>
@@ -229,15 +289,6 @@ const EventExpenses = () => {
                           editExpense(index);
                         }}
                       >
-                        {/* <td> */}
-                        {/* <td className="d-flex justify-content-around"> */}
-                        {/* <i className="bi bi-pencil text-warning"></i> */}
-                        {/* <i
-                          className="bi bi-trash3-fill text-danger"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => removeExpense(index, expense.item)}
-                        ></i>
-                      </td> */}
                         <td>{index + 1}</td>
                         <td>
                           <span value={expense.item}>{expense.item}</span>
@@ -264,24 +315,42 @@ const EventExpenses = () => {
                       <td colSpan="1">
                         {" " +
                           formatPriceWithCurrencyAndCommas(
-                            calculateTotal(event.expenses)
+                            calculateTotal(editedEvent.expenses)
                           )}
                       </td>
                     </tr>
                   </tfoot>
                 </table>
                 <PDFViewer>
-                  <Bill expenses={event} />
-                </PDFViewer>
-                {/* <div>
-                  <label htmlFor="paymentStatus">Payment done : </label>
-                  <input
-                    type="checkbox"
-                    id="paymentStatus"
-                    className="btn-check"
-                    autoComplete="off"
+                  <Bill
+                    event={editedEvent}
+                    config={config}
+                    paymentDetails={selectedPaymentDetails}
                   />
-                </div> */}
+                </PDFViewer>
+                {editedEvent.expenses.length && (
+                  <>
+                    <div className="my-3">
+                      <label htmlFor="paymentStatus">Payment done : </label>
+                      <input
+                        type="checkbox"
+                        id="paymentStatus"
+                        className="form-check-input ms-2"
+                        autoComplete="off"
+                        checked={editedEvent.paymentStatus === "done"}
+                        onChange={(e) => {
+                          setEditedEvent({
+                            ...editedEvent,
+                            paymentStatus: e.target.checked
+                              ? "done"
+                              : "pending",
+                          });
+                        }}
+                      />
+                    </div>
+                    {/* Notes */}
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -316,22 +385,19 @@ const EventExpenses = () => {
         {showEventModal && (
           <EventModal
             event={editedEvent}
+            newExpense={newExpense}
+            paymentDetailList={paymentDetailList}
+            header={`Edit Event - ${event.name}`}
+            cancelBtnText="Close"
             disableConfirmBtn={false}
+            confirmBtnText={false}
             handleConfirm={editEventModalConfirmBtn}
             handleCloseEventModal={handleCloseEventModal}
             handleModalOnChange={handleModalOnChange}
-            newExpense={newExpense}
-            header={`Edit Event - ${event.name}`}
-            cancelBtnText="Cancel"
-            confirmBtnText={false}
             handleChange={handleChangeEditEvent}
           />
         )}
       </div>
-      {/* {JSON.stringify(event)}
-      <br />
-      <br />
-      {JSON.stringify(editedEvent)} */}
     </Menu>
   );
 };

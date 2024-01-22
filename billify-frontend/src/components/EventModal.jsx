@@ -8,6 +8,7 @@ const EventModal = (props) => {
     cancelBtnText,
     confirmBtnText,
     event,
+    paymentDetailList,
   } = props;
 
   return (
@@ -34,7 +35,7 @@ const EventModal = (props) => {
                 <tr>
                   <td>
                     <label htmlFor="name">
-                      Event name<span className="text-danger">*</span>:{" "}
+                      Event name: <span className="text-danger fw-bold">*</span>
                     </label>
                   </td>
                   <td>
@@ -80,20 +81,71 @@ const EventModal = (props) => {
                     />
                   </td>
                 </tr>
-                {/* <tr>
+                <tr>
                   <td>
-                    <label htmlFor="paymentStatus">Payment Status: </label>
+                    <label htmlFor="billDate">Bill Date : </label>
                   </td>
                   <td>
                     <input
-                      type="checkbox"
-                      id="paymentStatus"
-                      name="paymentStatus"
-                      value={event.paymentStatus}
-                      onChange={handleChange}
+                      type="date"
+                      id="billDate"
+                      name="billDate"
+                      value={event?.billDate ?? ""}
+                      // className="ms-2 "
+                      onChange={(e) => {
+                        handleChange(e);
+                      }}
                     />
                   </td>
-                </tr> */}
+                </tr>
+                <tr>
+                  <td>
+                    <label htmlFor="ref">Ref : </label>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      id="ref"
+                      name="ref"
+                      value={event?.ref ?? ""}
+                      // className="ms-2 "
+                      onChange={(e) => {
+                        handleChange(e);
+                      }}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label htmlFor="bankAccountId">Payment Details : </label>
+                  </td>
+                  <td className="text-start" style={{ maxWidth: "175px" }}>
+                    {paymentDetailList.map((payment) => (
+                      <div
+                        key={payment.id}
+                        className={`text-left border rounded-3 p-1 my-1 ${
+                          payment.id === event?.paymentId
+                            ? " border-2 border-success"
+                            : "border-dark"
+                        }`}
+                        style={{ cursor: "pointer" }}
+                        name="paymentId"
+                        value={"payment.id"}
+                        onClick={(e) => {
+                          handleChange({
+                            target: {
+                              name: "paymentId",
+                              value: payment.id,
+                            },
+                          });
+                          console.log(payment.id);
+                        }}
+                      >
+                        <pre> {payment.details} </pre>
+                      </div>
+                    ))}
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>

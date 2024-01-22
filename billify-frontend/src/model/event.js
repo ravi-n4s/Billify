@@ -5,6 +5,9 @@ export const event = {
   expenses: [],
   // expenses: [{ item: "", quantity: "", cost: "" }],
   paymentStatus: "",
+  notes: "",
+  paymentId: "",
+  billDate: "",
 };
 
 export const expense = { item: "", quantity: "", cost: "" };

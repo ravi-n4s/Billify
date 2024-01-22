@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { calculateTotal, formatPriceWithCurrencyAndCommas } from "../util";
+import { readPaymentById } from "../services/paymentDetailService";
 
 // Register fonts if needed
 Font.register({
@@ -40,13 +42,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   companyName: {
-    fontSize: 16,
-    marginBottom: 5,
+    fontSize: 24,
+    marginBottom: 10,
+    marginTop: 10,
+    fontWeight: "bold",
+    fontStyle: "italic",
     color: "red",
   },
-  companyAddress: {
+  companyDetails: {
     fontSize: 12,
     marginBottom: 10,
+    textAlign: "center",
+    color: "green",
   },
   companyBox: {
     border: "1px solid #000",
@@ -54,9 +61,51 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  table: {
-    width: "100%",
+  particularsBox: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    fontSize: 12,
+    border: "0px",
+    padding: 10,
     marginBottom: 10,
+    marginTop: 10,
+  },
+  particularsLeft: {
+    textAlign: "left",
+  },
+  particularsRight: {
+    textAlign: "right",
+  },
+  flexRow: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  particularHeader: {
+    fontSize: 12,
+    marginBottom: 10,
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "red",
+  },
+  particularContent: {
+    fontSize: 12,
+    marginLeft: 8,
+    marginBottom: 10,
+    textAlign: "left",
+  },
+  table: {
+    width: "80%",
+    marginBottom: 50,
+    marginTop: 15,
+    marginLeft: "auto",
+    marginRight: "auto",
+    border: "2px solid #000",
+    // nthChild: {
+    //   odd: {
+    //     backgroundColor: "#f2f2f2",
+    //   },
+    // },
   },
   tableRow: {
     flexDirection: "row",
@@ -78,10 +127,24 @@ const styles = StyleSheet.create({
   border: {
     borderBottom: "1px solid #000",
   },
+  signature: {
+    textAlign: "center",
+    fontSize: 12,
+    color: "purple",
+    marginTop: 25,
+    marginBottom: 25,
+  },
+  paymentDetailsBox: {
+    fontSize: 12,
+    textAlign: "left",
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: 10,
+  },
 });
 
 // Create Document Component
-const Bill = ({ event }) => {
+const Bill = ({ event, paymentDetails, config }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -90,16 +153,42 @@ const Bill = ({ event }) => {
 
           {/* Company Details */}
           <View style={styles.companyBox}>
-            <Text style={styles.companyName}>Your Company Name</Text>
-            <Text style={styles.companyAddress}>Your Company Address</Text>
+            <Text style={styles.companyName}>{config.company.name}</Text>
+            <Text style={styles.companyDetails}>{config.company.address}</Text>
+            <Text style={styles.companyDetails}>{config.company.contact}</Text>
           </View>
 
-          {/* Address */}
-          <Text style={styles.companyAddress}>Customer Address</Text>
-
+          {/* Client Address */}
+          <View style={styles.particularsBox}>
+            <View style={styles.particularsLeft}>
+              {!!event.ref && (
+                <View style={styles.flexRow}>
+                  <Text style={styles.particularHeader}>Ref: </Text>
+                  <Text style={styles.particularContent}>{"event.ref"}</Text>
+                </View>
+              )}
+              {!!event.client?.address && (
+                <View styles={styles.flexRow}>
+                  <Text style={styles.particularHeader}>For: </Text>
+                  <Text style={styles.particularContent}>
+                    {event.client?.address}
+                  </Text>
+                </View>
+              )}
+            </View>
+            {!!event?.billDate && (
+              <View style={styles.particularsRight}>
+                <View style={styles.flexRow}>
+                  <Text style={styles.particularHeader}>Date:</Text>
+                  <Text style={styles.particularContent}>{event.billDate}</Text>
+                </View>
+              </View>
+            )}
+          </View>
           {/* Expense Table */}
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
+              <Text style={[styles.tableCell, styles.textCenter]}>S No.</Text>
               <Text style={[styles.tableCell, styles.textCenter]}>Item</Text>
               <Text style={[styles.tableCell, styles.textCenter]}>Qty</Text>
               <Text style={[styles.tableCell, styles.textCenter]}>Amount</Text>
@@ -108,24 +197,47 @@ const Bill = ({ event }) => {
             {event?.expenses.map((expense, index) => (
               <View key={index} style={styles.tableRow}>
                 <Text style={[styles.tableCell, styles.textCenter]}>
+                  {index + 1}
+                </Text>
+                <Text style={[styles.tableCell, styles.textCenter]}>
                   {expense.item}
                 </Text>
                 <Text style={[styles.tableCell, styles.textCenter]}>
                   {expense.quantity}
                 </Text>
                 <Text style={[styles.tableCell, styles.textCenter]}>
-                  {expense.cost * expense.quantity}
+                  {formatPriceWithCurrencyAndCommas(
+                    expense.quantity * expense.cost
+                  )}
                 </Text>
               </View>
             ))}
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.textCenter]}></Text>
+              <Text style={[styles.tableCell, styles.textCenter]}>
+                {"Total Amount"}
+              </Text>
+              <Text style={[styles.tableCell, styles.textCenter]}></Text>
+              <Text style={[styles.tableCell, styles.textCenter]}>
+                {" " +
+                  formatPriceWithCurrencyAndCommas(
+                    calculateTotal(event.expenses)
+                  )}
+              </Text>
+            </View>
+          </View>
+
+          {/* Signature */}
+          <View style={styles.signature}>
+            <Text>{config.signature}</Text>
+            <Text>{config.thankyouNote}</Text>
           </View>
 
           {/* Bank Details */}
-          <Text style={styles.companyAddress}>Bank Details:</Text>
-          <Text style={styles.companyAddress}>
-            Account Number: XXXX-XXXX-XXXX
-          </Text>
-          <Text style={styles.companyAddress}>Bank: Your Bank Name</Text>
+          <View style={styles.paymentDetailsBox}>
+            <Text style={{}}>Payment Details:</Text>
+            <Text>{paymentDetails}</Text>
+          </View>
         </View>
       </Page>
     </Document>

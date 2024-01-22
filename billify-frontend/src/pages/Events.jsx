@@ -114,14 +114,17 @@ const Events = () => {
           {events.map((event) => (
             <li
               key={event.id}
-              className="list-group-item d-flex justify-content-between align-items-center col-md-10"
+              className="list-group-item d-flex justify-content-between align-items-center row col-md-10"
               style={{ cursor: "pointer" }}
             >
-              <span onClick={() => handleEventClick(event.id)}>
+              <span
+                className="col-4"
+                onClick={() => handleEventClick(event.id)}
+              >
                 {event.name}
               </span>
               <span
-                className={`badge ${
+                className={`col-3 badge ${
                   event?.paymentStatus === "done"
                     ? "bg-success"
                     : "bg-secondary"
@@ -134,7 +137,7 @@ const Events = () => {
                   : "NA"}
               </span>
               <i
-                className="bi bi-trash3-fill text-danger"
+                className="col-2 bi bi-trash3-fill text-danger"
                 style={{ cursor: "pointer" }}
                 onClick={() => handleDeleteEvent(event)}
               ></i>
