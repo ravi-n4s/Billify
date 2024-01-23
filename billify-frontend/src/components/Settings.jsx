@@ -37,8 +37,8 @@ const Settings = (props) => {
           </div>
           <div className="modal-body d-flex flex-column">
             {paymentDetails.map((payment) => (
-              <div className="d-flex justify-content-evenly" key={payment.id}>
-                <div className="text-center d-flex align-content-center">
+              <div className="d-flex justify-content-between" key={payment.id}>
+                <div className="text-center align-content-center">
                   <i
                     className="bi-trash3-fill text-danger"
                     onClick={() => deletePayment(payment.id)}
