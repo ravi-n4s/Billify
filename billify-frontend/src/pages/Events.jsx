@@ -114,11 +114,11 @@ const Events = () => {
           {events.map((event) => (
             <li
               key={event.id}
-              className="list-group-item d-flex justify-content-between align-items-center row col-md-10"
+              className="list-group-item d-flex justify-content-between align-items-center row col-11 me-auto ms-auto"
               style={{ cursor: "pointer" }}
             >
               <span
-                className="col-4"
+                className="col-5 co-sm-3"
                 onClick={() => handleEventClick(event.id)}
               >
                 {event.name}
@@ -163,6 +163,11 @@ const Events = () => {
           header="Create Event"
         />
       )}
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
     </Menu>
   );
 };

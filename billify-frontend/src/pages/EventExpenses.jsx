@@ -398,6 +398,11 @@ const EventExpenses = () => {
           />
         )}
       </div>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
     </Menu>
   );
 };
