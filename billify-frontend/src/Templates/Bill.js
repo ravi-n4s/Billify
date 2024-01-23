@@ -7,7 +7,12 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
-import { calculateTotal, formatPriceWithCurrencyAndCommas } from "../util";
+import {
+  calculateTotal,
+  formatPriceWithCommas,
+  formatPriceWithCurrencyAndCommas,
+  formatPriceWithCurrencyAndCommasForPDF,
+} from "../util";
 
 // Register fonts if needed
 Font.register({
@@ -163,7 +168,7 @@ const Bill = ({ event, paymentDetails, config }) => {
               {!!event.ref && (
                 <View style={styles.flexRow}>
                   <Text style={styles.particularHeader}>Ref: </Text>
-                  <Text style={styles.particularContent}>{"event.ref"}</Text>
+                  <Text style={styles.particularContent}>{event.ref}</Text>
                 </View>
               )}
               {!!event.client?.address && (
@@ -205,9 +210,7 @@ const Bill = ({ event, paymentDetails, config }) => {
                   {expense.quantity}
                 </Text>
                 <Text style={[styles.tableCell, styles.textCenter]}>
-                  {formatPriceWithCurrencyAndCommas(
-                    expense.quantity * expense.cost
-                  )}
+                  {formatPriceWithCommas(expense.quantity * expense.cost)}
                 </Text>
               </View>
             ))}
@@ -219,7 +222,7 @@ const Bill = ({ event, paymentDetails, config }) => {
               <Text style={[styles.tableCell, styles.textCenter]}></Text>
               <Text style={[styles.tableCell, styles.textCenter]}>
                 {" " +
-                  formatPriceWithCurrencyAndCommas(
+                  formatPriceWithCurrencyAndCommasForPDF(
                     calculateTotal(event.expenses)
                   )}
               </Text>

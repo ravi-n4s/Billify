@@ -8,6 +8,7 @@ export const event = {
   notes: "",
   paymentId: "",
   billDate: "",
+  ref: "",
 };
 
 export const expense = { item: "", quantity: "", cost: "" };
