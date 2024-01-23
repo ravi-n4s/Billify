@@ -131,7 +131,7 @@ const EventModal = (props) => {
                         style={{ cursor: "pointer" }}
                         name="paymentId"
                         value={"payment.id"}
-                        onClick={(e) => {
+                        onClick={() => {
                           handleChange({
                             target: {
                               name: "paymentId",

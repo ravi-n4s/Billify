@@ -9,6 +9,8 @@ import Menu from "../components/Menu";
 import { calculateTotal, formatPriceWithCurrencyAndCommas } from "../util";
 import EventModal from "../components/EventModal";
 import { event } from "../model/event";
+import { readAllPayments } from "../services/paymentDetailService";
+import { payment } from "../model/payment";
 
 const Events = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const Events = () => {
   const [showEventModal, setShowEventModal] = useState(false);
   const [newEvent, setNewEvent] = useState(event);
   const [disableCreateBtn, setDisableCreateBtn] = useState(true);
+  const [paymentDetails, setPaymentDetails] = useState([payment]);
 
   useEffect(() => {
     readAllEvents().then((data) => {
@@ -24,6 +27,9 @@ const Events = () => {
   }, []);
 
   const handleCreateEvent = () => {
+    readAllPayments().then((data) => {
+      setPaymentDetails(data);
+    });
     setShowEventModal(true);
   };
 
@@ -91,7 +97,7 @@ const Events = () => {
       window.confirm(`Are you sure you want to delete event - ${event.name}`)
     ) {
       console.log("Deleting event", event);
-      deleteEventById(event.id).then((isDeleted) => {
+      deleteEventById(event.id).then(() => {
         readAllEvents().then((data) => {
           setEvents(data);
         });
@@ -161,6 +167,7 @@ const Events = () => {
           disableConfirmBtn={disableCreateBtn}
           handleChange={handleChange}
           header="Create Event"
+          paymentDetailList={paymentDetails}
         />
       )}
       <br />

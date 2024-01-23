@@ -8,7 +8,6 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { calculateTotal, formatPriceWithCurrencyAndCommas } from "../util";
-import { readPaymentById } from "../services/paymentDetailService";
 
 // Register fonts if needed
 Font.register({

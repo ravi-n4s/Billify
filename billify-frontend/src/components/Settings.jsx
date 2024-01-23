@@ -41,7 +41,7 @@ const Settings = (props) => {
                 <div className="text-center d-flex align-content-center">
                   <i
                     className="bi-trash3-fill text-danger"
-                    onClick={(e) => deletePayment(payment.id)}
+                    onClick={() => deletePayment(payment.id)}
                     style={{ cursor: "pointer" }}
                   ></i>
                 </div>
@@ -69,7 +69,7 @@ const Settings = (props) => {
             {/* <textarea name="" id="" cols="30" rows="10"></textarea> */}
             {!addClicked && (
               <button
-                className="btn btn-warning col-2 rounded-pill"
+                className="btn btn-warning col-2 rounded-pill m-3"
                 onClick={() => {
                   setAddClicked(true);
                 }}

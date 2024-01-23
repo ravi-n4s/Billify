@@ -69,6 +69,11 @@ const EventExpenses = () => {
     fetchPaymentDetails();
   }, [editedEvent.paymentId]);
 
+  useEffect(() => {
+    if (newExpense.item && newExpense.quantity && newExpense.cost)
+      setDisableConfirmBtn(false);
+  }, [newExpense]);
+
   const handleSaveToDB = () => {
     toast.promise(updateDocumentById(eventId, editedEvent), {
       pending: "Saving ... ",
@@ -108,8 +113,6 @@ const EventExpenses = () => {
     //on key press
     const { name, value } = e.target;
     setNewExpense({ ...newExpense, [name]: value });
-    if (newExpense.item && newExpense.quantity && newExpense.cost)
-      setDisableConfirmBtn(false);
   };
 
   const editExpense = (index) => {
@@ -259,7 +262,7 @@ const EventExpenses = () => {
               />
             }
           >
-            {({ blob, url, loading, error }) => {
+            {({ blob }) => {
               return <DownloadButton pdf={blob} />;
             }}
           </BlobProvider>
