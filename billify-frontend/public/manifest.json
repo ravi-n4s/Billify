@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Billify",
+  "name": "Billify - create and share bills",
+  "description": "Billify is a simple web app to create and share bills",
   "icons": [
     {
       "src": "favicon.ico",
