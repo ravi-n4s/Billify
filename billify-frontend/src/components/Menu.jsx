@@ -28,7 +28,6 @@ const Menu = (props) => {
   // };
 
   const handleSave = () => {
-    // console.log(bankDetails);
     // if (newPaymentDetail !== "") {
     //   setPaymentDetails([...paymentDetails, { details: newPaymentDetail }]);
     // }

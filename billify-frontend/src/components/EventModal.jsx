@@ -30,26 +30,51 @@ const EventModal = (props) => {
             </button>
           </div>
           <div className="modal-body d-flex flex-column">
+            <div className="col-9 row mx-auto my-3">
+              {["Bill", "Estimate"].map((type) => (
+                <div
+                  className={`col-4 text-left border rounded-3 p-1 ${
+                    event.type === type
+                      ? " border-3 border-secondary bg-secondary text-white"
+                      : "border-dark"
+                  }`}
+                  style={{ cursor: "pointer" }}
+                  name="type"
+                  value={"event.type"}
+                  onClick={() => {
+                    handleChange({
+                      target: {
+                        name: "type",
+                        value: type,
+                      },
+                    });
+                  }}
+                >
+                  {type}
+                </div>
+              ))}
+            </div>
             <table>
               <tbody>
                 <tr>
                   <td>
                     <label htmlFor="name">
-                      Event name: <span className="text-danger fw-bold">*</span>
+                      Name: <span className="text-danger fw-bold">*</span>
                     </label>
                   </td>
-                  <td>
+                  <td className="text-start">
                     <input
                       type="text"
                       name="name"
                       id="name"
                       value={event.name}
                       onChange={handleChange}
+                      className="my-2"
                       autoFocus
                     />
                   </td>
                 </tr>
-                <tr>
+                {/* <tr>
                   <td>
                     <label htmlFor="clientName">Client name: </label>
                   </td>
@@ -64,19 +89,19 @@ const EventModal = (props) => {
                       }}
                     />
                   </td>
-                </tr>
+                </tr> */}
                 <tr>
                   <td>
-                    <label htmlFor="clientAddress">Client address: </label>
+                    <label htmlFor="clientAddress">Address: </label>
                   </td>
-                  <td>
+                  <td className="text-start">
                     <textarea
                       id="clientAddress"
-                      name="client.address"
-                      value={event.client?.address ?? ""}
-                      className="form-control"
+                      name="address"
+                      value={event?.address ?? ""}
+                      className="form-control my-2"
                       onChange={(e) => {
-                        handleChange(e, "client.address");
+                        handleChange(e, "address");
                       }}
                     />
                   </td>
@@ -85,13 +110,13 @@ const EventModal = (props) => {
                   <td>
                     <label htmlFor="billDate">Bill Date : </label>
                   </td>
-                  <td>
+                  <td className="text-start">
                     <input
                       type="date"
                       id="billDate"
                       name="billDate"
                       value={event?.billDate ?? ""}
-                      // className="ms-2 "
+                      className="my-2"
                       onChange={(e) => {
                         handleChange(e);
                       }}
@@ -102,16 +127,35 @@ const EventModal = (props) => {
                   <td>
                     <label htmlFor="ref">Ref : </label>
                   </td>
-                  <td>
+                  <td className="text-start">
                     <input
                       type="text"
                       id="ref"
                       name="ref"
                       value={event?.ref ?? ""}
-                      // className="ms-2 "
+                      className="my-2"
                       onChange={(e) => {
                         handleChange(e);
                       }}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label htmlFor="transport">Transport : </label>
+                  </td>
+                  <td className="text-start">
+                    <input
+                      type="text"
+                      id="transport"
+                      name="transport"
+                      // checked={event?.transport ?? false}
+                      value={event?.transport ?? ""}
+                      className="my-2"
+                      onChange={(e) => {
+                        handleChange(e);
+                      }}
+                      placeholder="input cost here"
                     />
                   </td>
                 </tr>
@@ -123,7 +167,7 @@ const EventModal = (props) => {
                     {paymentDetailList.map((payment) => (
                       <div
                         key={payment.id}
-                        className={`text-left border rounded-3 p-1 my-1 ${
+                        className={`text-left border rounded-3 p-1 my-2 ${
                           payment.id === event?.paymentId
                             ? " border-2 border-success"
                             : "border-dark"
@@ -138,10 +182,9 @@ const EventModal = (props) => {
                               value: payment.id,
                             },
                           });
-                          console.log(payment.id);
                         }}
                       >
-                        <pre> {payment.details} </pre>
+                        <pre> {payment.details.trim()} </pre>
                       </div>
                     ))}
                   </td>

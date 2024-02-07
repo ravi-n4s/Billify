@@ -29,11 +29,12 @@ export const readAllEvents = async () => {
         name: doc.data().name,
         expenses: doc.data().expenses,
         paymentStatus: doc.data().paymentStatus,
+        type: doc.data().type,
+        transport: doc.data().transport,
       };
       events.push(eventData);
     });
 
-    console.log("All events:", events);
     return events;
   } catch (error) {
     console.error("Error reading events:", error);
@@ -47,10 +48,8 @@ export const readEventById = async (documentId) => {
     const docSnapshot = await getDoc(docRef);
 
     if (docSnapshot.exists()) {
-      console.log("Document data:", docSnapshot.data());
       return docSnapshot.data();
     } else {
-      console.log("No such document!");
       return null;
     }
   } catch (error) {
@@ -61,8 +60,6 @@ export const readEventById = async (documentId) => {
 export const createEvent = async (data) => {
   try {
     const docRef = await addDoc(collection(db, collectionName), data);
-    console.log("Document created ", docRef);
-    console.log("Document created with ID:", docRef.id);
     return docRef.id;
   } catch (error) {
     console.error("Error creating document:", error);
@@ -73,7 +70,6 @@ export const createEvent = async (data) => {
 export const deleteEventById = async (documentId) => {
   try {
     await deleteDoc(doc(db, collectionName, documentId));
-    console.log("Document deleted successfully!");
   } catch (error) {
     console.error("Error deleting document:", error);
   }

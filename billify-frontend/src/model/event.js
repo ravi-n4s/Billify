@@ -1,7 +1,7 @@
 export const event = {
   id: "",
   name: "",
-  client: { name: "", address: "" },
+  address: "",
   expenses: [],
   // expenses: [{ item: "", quantity: "", cost: "" }],
   paymentStatus: "",
@@ -9,6 +9,8 @@ export const event = {
   paymentId: "",
   billDate: "",
   ref: "",
+  type: "Bill",
+  transport: "",
 };
 
 export const expense = { item: "", quantity: "", cost: "" };

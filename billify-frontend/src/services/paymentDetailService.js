@@ -14,7 +14,6 @@ export const readPaymentById = async (documentId) => {
     const docRef = doc(db, collectionName, documentId);
     const docSnap = await getDocs(docRef);
     const paymentData = docSnap.data();
-    console.log("Payment data:", paymentData);
     return paymentData;
   } catch (error) {
     console.error("Error reading payment:", error);
@@ -39,7 +38,6 @@ export const readAllPayments = async () => {
       payments.push(paymentData);
     });
 
-    console.log("All payments:", payments);
     return payments;
   } catch (error) {
     console.error("Error reading payments:", error);
@@ -50,7 +48,6 @@ export const readAllPayments = async () => {
 export const deletePaymentById = async (documentId) => {
   try {
     await deleteDoc(doc(db, collectionName, documentId));
-    console.log("Document deleted successfully");
   } catch (error) {
     console.error("Error deleting document:", error);
   }

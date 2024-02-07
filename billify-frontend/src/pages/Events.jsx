@@ -71,11 +71,8 @@ const Events = () => {
   };
 
   const handleModalCreateBtn = () => {
-    console.log(JSON.stringify(newEvent));
     if (newEvent.name) {
-      console.log("Creating event", event);
       createEvent(newEvent).then((eventId) => {
-        console.log(eventId);
         newEvent.id = eventId;
         if (eventId) {
           setEvents([...events, newEvent]);
@@ -96,7 +93,6 @@ const Events = () => {
     if (
       window.confirm(`Are you sure you want to delete event - ${event.name}`)
     ) {
-      console.log("Deleting event", event);
       deleteEventById(event.id).then(() => {
         readAllEvents().then((data) => {
           setEvents(data);
@@ -127,7 +123,7 @@ const Events = () => {
                 className="col-5 co-sm-3"
                 onClick={() => handleEventClick(event.id)}
               >
-                {event.name}
+                {event.name} - {event.type}
               </span>
               <span
                 className={`col-3 badge ${
@@ -138,7 +134,8 @@ const Events = () => {
               >
                 {event.expenses.length
                   ? formatPriceWithCurrencyAndCommas(
-                      calculateTotal(event.expenses)
+                      calculateTotal(event.expenses) +
+                        parseInt(event?.transport ? event.transport : 0)
                     )
                   : "NA"}
               </span>

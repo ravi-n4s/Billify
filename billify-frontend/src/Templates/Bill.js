@@ -10,30 +10,30 @@ import {
 import {
   calculateTotal,
   formatPriceWithCommas,
-  formatPriceWithCurrencyAndCommas,
   formatPriceWithCurrencyAndCommasForPDF,
 } from "../util";
 
 // Register fonts if needed
-Font.register({
-  family: "Roboto",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/roboto/v27/KFOmCnqEu92Fr1Mu4mxKKTU1Kvnz.woff2",
-      fontWeight: "normal",
-    },
-    {
-      src: "https://fonts.gstatic.com/s/roboto/v27/KFOlCnqEu92Fr1MmEU9fBBc4.woff2",
-      fontWeight: "bold",
-    },
-  ],
-});
+// Font.register({
+//   family: "Roboto",
+//   fonts: [
+//     {
+//       src: "https://fonts.gstatic.com/s/roboto/v27/KFOmCnqEu92Fr1Mu4mxKKTU1Kvnz.woff2",
+//       fontWeight: "normal",
+//     },
+//     {
+//       src: "https://fonts.gstatic.com/s/roboto/v27/KFOlCnqEu92Fr1MmEU9fBBc4.woff2",
+//       fontWeight: "bold",
+//     },
+//   ],
+// });
 
 // Create styles
 const styles = StyleSheet.create({
   page: {
     flexDirection: "row",
     backgroundColor: "#ffffff",
+    fontFamily: "Times-Roman",
   },
   section: {
     margin: 10,
@@ -44,12 +44,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
     textAlign: "center",
+    fontWeight: "bold",
+    color: "blue",
   },
   companyName: {
     fontSize: 24,
     marginBottom: 10,
     marginTop: 10,
     fontWeight: "bold",
+    textAlign: "center",
     fontStyle: "italic",
     color: "red",
   },
@@ -61,9 +64,9 @@ const styles = StyleSheet.create({
   },
   companyBox: {
     border: "1px solid #000",
-    borderRadius: 10,
+    borderRadius: 25,
     padding: 10,
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   particularsBox: {
     display: "flex",
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     border: "0px",
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 5,
     marginTop: 10,
   },
   particularsLeft: {
@@ -101,7 +104,7 @@ const styles = StyleSheet.create({
   table: {
     width: "80%",
     marginBottom: 50,
-    marginTop: 15,
+    // marginTop: 5,
     marginLeft: "auto",
     marginRight: "auto",
     border: "2px solid #000",
@@ -114,6 +117,24 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     borderBottom: "1px solid #000",
+  },
+  tableSerialNumberCell: {
+    flex: 0.3,
+    padding: 8,
+    fontSize: 12,
+    textAlign: "center",
+  },
+  tableItemCell: {
+    flex: 1.9,
+    padding: 8,
+    fontSize: 12,
+    textAlign: "center",
+  },
+  tableQtyCell: {
+    flex: 0.8,
+    padding: 8,
+    fontSize: 12,
+    textAlign: "center",
   },
   tableCell: {
     flex: 1,
@@ -135,8 +156,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
     color: "purple",
-    marginTop: 25,
-    marginBottom: 25,
+    marginTop: 10,
+    marginBottom: 10,
   },
   paymentDetailsBox: {
     fontSize: 12,
@@ -153,7 +174,7 @@ const Bill = ({ event, paymentDetails, config }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.section}>
-          <Text style={styles.header}>Cash Bill</Text>
+          <Text style={styles.header}>Cash {event.type}</Text>
 
           {/* Company Details */}
           <View style={styles.companyBox}>
@@ -171,11 +192,12 @@ const Bill = ({ event, paymentDetails, config }) => {
                   <Text style={styles.particularContent}>{event.ref}</Text>
                 </View>
               )}
-              {!!event.client?.address && (
-                <View styles={styles.flexRow}>
+              {!!event.address && (
+                <View style={styles.flexRow}>
                   <Text style={styles.particularHeader}>For: </Text>
                   <Text style={styles.particularContent}>
-                    {event.client?.address}
+                    {`${event.name}\n`}
+                    {event.address}
                   </Text>
                 </View>
               )}
@@ -184,7 +206,9 @@ const Bill = ({ event, paymentDetails, config }) => {
               <View style={styles.particularsRight}>
                 <View style={styles.flexRow}>
                   <Text style={styles.particularHeader}>Date:</Text>
-                  <Text style={styles.particularContent}>{event.billDate}</Text>
+                  <Text style={styles.particularContent}>
+                    {new Date(event.billDate).toLocaleDateString("en-GB")}
+                  </Text>
                 </View>
               </View>
             )}
@@ -192,21 +216,25 @@ const Bill = ({ event, paymentDetails, config }) => {
           {/* Expense Table */}
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={[styles.tableCell, styles.textCenter]}>S No.</Text>
-              <Text style={[styles.tableCell, styles.textCenter]}>Item</Text>
-              <Text style={[styles.tableCell, styles.textCenter]}>Qty</Text>
+              <Text style={[styles.tableSerialNumberCell, styles.textCenter]}>
+                S No.
+              </Text>
+              <Text style={[styles.tableItemCell, styles.textCenter]}>
+                Item
+              </Text>
+              <Text style={[styles.tableQtyCell, styles.textCenter]}>Qty</Text>
               <Text style={[styles.tableCell, styles.textCenter]}>Amount</Text>
             </View>
 
             {event?.expenses.map((expense, index) => (
               <View key={index} style={styles.tableRow}>
-                <Text style={[styles.tableCell, styles.textCenter]}>
+                <Text style={[styles.tableSerialNumberCell, styles.textCenter]}>
                   {index + 1}
                 </Text>
-                <Text style={[styles.tableCell, styles.textCenter]}>
+                <Text style={[styles.tableItemCell, styles.textCenter]}>
                   {expense.item}
                 </Text>
-                <Text style={[styles.tableCell, styles.textCenter]}>
+                <Text style={[styles.tableQtyCell, styles.textCenter]}>
                   {expense.quantity}
                 </Text>
                 <Text style={[styles.tableCell, styles.textCenter]}>
@@ -215,15 +243,20 @@ const Bill = ({ event, paymentDetails, config }) => {
               </View>
             ))}
             <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, styles.textCenter]}></Text>
-              <Text style={[styles.tableCell, styles.textCenter]}>
-                {"Total Amount"}
+              <Text
+                style={[styles.tableSerialNumberCell, styles.textCenter]}
+              ></Text>
+              <Text style={[styles.tableItemCell, styles.textCenter]}>
+                {event?.transport
+                  ? "Total Amount (including transport)"
+                  : "Total Amount"}
               </Text>
-              <Text style={[styles.tableCell, styles.textCenter]}></Text>
+              <Text style={[styles.tableQtyCell, styles.textCenter]}></Text>
               <Text style={[styles.tableCell, styles.textCenter]}>
                 {" " +
                   formatPriceWithCurrencyAndCommasForPDF(
-                    calculateTotal(event.expenses)
+                    calculateTotal(event.expenses) +
+                      parseInt(event?.transport ? event.transport : 0)
                   )}
               </Text>
             </View>

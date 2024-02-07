@@ -13,7 +13,6 @@ export const formatPriceWithCurrencyAndCommasForPDF = (price) => {
 export const calculateTotal = (expenses) => {
   let total = 0;
   expenses.forEach((expense) => {
-    // console.log(expense.quantity, expense.cost, total);
     total += parseFloat(expense.quantity) * parseFloat(expense.cost);
   });
   return total;

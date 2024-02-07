@@ -12,7 +12,7 @@ import { event as eventObj, expense } from "../model/event";
 import { config } from "../config";
 import { payment } from "../model/payment";
 import { readAllPayments } from "../services/paymentDetailService";
-// import Toast from "../components/Toast";
+import ShareButton from "../components/ShareButton";
 
 const EventExpenses = () => {
   const { eventId } = useParams();
@@ -28,6 +28,8 @@ const EventExpenses = () => {
   const currentIndex = useRef(-1);
   // const selectedPaymentDetails = useRef("");
   const [selectedPaymentDetails, setSelectedPaymentDetails] = useState("");
+
+  const isWebShareSupported = navigator.share !== undefined;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,12 +97,12 @@ const EventExpenses = () => {
   const handleCloseEditExpenseModal = () => {
     setshowEditExpenseModal(false);
     setDisableConfirmBtn(true);
+    setNewExpense({ item: "", quantity: "", cost: "" });
   };
 
   const handleAddExpenseConfirm = (e) => {
     //on clicking confirm button in modal
     e.preventDefault();
-    console.log("clicked confirm");
     setEditedEvent({
       ...editedEvent,
       expenses: [...editedEvent.expenses, newExpense],
@@ -144,10 +146,7 @@ const EventExpenses = () => {
       )
     ) {
       const updatedExpenses = editedEvent.expenses;
-      console.log(currentIndex.current);
-      console.log("before remove", updatedExpenses);
       updatedExpenses.splice(currentIndex.current, 1);
-      console.log("after", updatedExpenses);
       setEditedEvent({ ...editedEvent, expenses: updatedExpenses });
       currentIndex.current = -1;
       handleCloseEditExpenseModal();
@@ -156,7 +155,6 @@ const EventExpenses = () => {
 
   const handleChangeEditEvent = (e, nestedProperty) => {
     const { name, value } = e.target;
-    console.log(name, value);
 
     setEditedEvent((prevEvent) => {
       // Split the nested property string into an array
@@ -182,7 +180,6 @@ const EventExpenses = () => {
       // If it's not a nested property, update directly
       if (!nestedProperty) {
         updatedEvent[name] = value;
-        console.log("paymentId", value);
         if (name === "paymentId") {
           setPaymentDetailList(paymentDetailList);
           // setEditedEvent({
@@ -209,7 +206,7 @@ const EventExpenses = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "bill.pdf";
+      a.download = `${editedEvent.name}-${config.brand}_${editedEvent.type}.pdf`;
       a.click();
     };
 
@@ -218,7 +215,7 @@ const EventExpenses = () => {
         onClick={downloadPDF}
         className="btn btn-warning rounded-pill px-3 px-sm-5"
       >
-        Download
+        <i className="bi bi-download me-2"></i>
       </button>
     );
   };
@@ -227,20 +224,21 @@ const EventExpenses = () => {
     <Menu>
       <div className="text-center mt-5">
         <br />
-        <div className=" d-flex justify-content-center">
-          <h4 className="">{editedEvent?.name + " "}</h4>
+        <div className=" d-flex my-3 justify-content-center">
+          <h4 className="">
+            {`${editedEvent?.name ?? "NA"}'s ${editedEvent.type}`}
+          </h4>
           <i
             className="bi bi-pencil bi-sm text-warning ms-1 ms-sm-2 d-flex align-items-center"
             style={{ cursor: "pointer" }}
             onClick={handleEditEvent}
           ></i>
         </div>
-        <p className="mb-4"> Client Name : {event?.client?.name ?? "NA"}</p>
+        {/* <p className="mb-4"> Client Name : {event?.client?.name ?? "NA"}</p> */}
         <div className="col-8 offset-2 my-3 d-flex justify-content-between fixed-bottom">
           {" "}
           <button
             onClick={() => {
-              console.log("clicked");
               setShowExpenseModal(true);
             }}
             className="btn btn-primary rounded-pill px-3 px-sm-5"
@@ -264,6 +262,26 @@ const EventExpenses = () => {
           >
             {({ blob }) => {
               return <DownloadButton pdf={blob} />;
+            }}
+          </BlobProvider>
+          <BlobProvider
+            document={
+              <Bill
+                event={editedEvent}
+                config={config}
+                paymentDetails={selectedPaymentDetails}
+              />
+            }
+          >
+            {({ blob }) => {
+              return (
+                <ShareButton
+                  isWebShareSupported={isWebShareSupported}
+                  pdf={blob}
+                  editedEvent={editedEvent}
+                  config={config}
+                />
+              );
             }}
           </BlobProvider>
         </div>
@@ -313,12 +331,19 @@ const EventExpenses = () => {
                   <tfoot>
                     <tr>
                       <td colSpan="4" className="text-center fw-bold">
-                        Total
+                        {editedEvent?.transport
+                          ? "Total Amount (including transport)"
+                          : "Total Amount"}
                       </td>
                       <td colSpan="1">
                         {" " +
                           formatPriceWithCurrencyAndCommas(
-                            calculateTotal(editedEvent.expenses)
+                            calculateTotal(editedEvent.expenses) +
+                              parseInt(
+                                editedEvent?.transport
+                                  ? editedEvent.transport
+                                  : 0
+                              )
                           )}
                       </td>
                     </tr>
@@ -390,7 +415,7 @@ const EventExpenses = () => {
             event={editedEvent}
             newExpense={newExpense}
             paymentDetailList={paymentDetailList}
-            header={`Edit Event - ${event.name}`}
+            header={`Edit Event - ${editedEvent.name}`}
             cancelBtnText="Close"
             disableConfirmBtn={false}
             confirmBtnText={false}
